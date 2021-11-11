@@ -11,20 +11,37 @@ import java.awt.Font;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
+
+import br.senai.sp.jandira.model.Aluno;
 import br.senai.sp.jandira.model.Periodos;
+import br.senai.sp.jandira.repository.AlunoRepository;
+
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JList;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.Color;
 
 public class FrameCadastroAlunos extends JFrame {
 	private JPanel contentPane;
 	private JTextField txtMatricula;
 	private JTextField txtNome;
+	
+	private DefaultListModel<String> modelAlunos;
+	
+	private AlunoRepository turma;
 
+	private int posicao;
+	
 	/**
-	 * Create the frame.
+	 * Create the frame. {} []
 	 */
 	public FrameCadastroAlunos() {
+		turma = new AlunoRepository();
+		modelAlunos = new DefaultListModel<String>();
+		
 		setTitle("Cadastro de Alunos");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
@@ -58,12 +75,31 @@ public class FrameCadastroAlunos extends JFrame {
 		lblPeriodo.setBounds(10, 73, 51, 14);
 		contentPane.add(lblPeriodo);
 		
-		JComboBox comboPeriodo = new JComboBox();
-		comboPeriodo.setModel(new DefaultComboBoxModel(Periodos.values()));
+		JComboBox<String> comboPeriodo = new JComboBox<String>();
+		DefaultComboBoxModel<String> modelPeriodo = new DefaultComboBoxModel<String>();
+		
+		for (Periodos periodo : Periodos.values()) {
+			modelPeriodo.addElement(periodo.getDescricao());
+		}
+		
+		comboPeriodo.setModel(modelPeriodo);
 		comboPeriodo.setBounds(71, 70, 110, 22);
 		contentPane.add(comboPeriodo);
 		
 		JButton btnSalvar = new JButton("Salvar Aluno");
+		btnSalvar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Aluno aluno = new Aluno();
+				aluno.setMatricula(txtMatricula.getText());
+				aluno.setNome(txtNome.getText());
+				
+				turma.gravar(aluno, posicao);
+				posicao++;
+				
+				modelAlunos.addElement(aluno.getNome());
+			}
+		});
+		btnSalvar.setBackground(new Color(0, 204, 102));
 		btnSalvar.setBounds(10, 210, 171, 40);
 		contentPane.add(btnSalvar);
 		
@@ -77,6 +113,7 @@ public class FrameCadastroAlunos extends JFrame {
 		contentPane.add(scrollPaneOfListAlunos);
 		
 		JList listAlunos = new JList();
+		listAlunos.setModel(modelAlunos);
 		scrollPaneOfListAlunos.setViewportView(listAlunos);
 	}
 }

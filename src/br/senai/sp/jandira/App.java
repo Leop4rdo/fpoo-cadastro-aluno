@@ -7,6 +7,7 @@ public class App {
 	public static void main(String[] args) {
 		FrameCadastroAlunos frame = new FrameCadastroAlunos();
 		frame.setVisible(true);
+		
 	}
 
 }
