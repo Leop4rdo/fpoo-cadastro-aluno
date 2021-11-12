@@ -6,6 +6,8 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.JLabel;
 import java.awt.Font;
 import javax.swing.JTextField;
@@ -20,6 +22,8 @@ import br.senai.sp.jandira.repository.AlunoRepository;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Color;
@@ -92,11 +96,21 @@ public class FrameCadastroAlunos extends JFrame {
 				Aluno aluno = new Aluno();
 				aluno.setMatricula(txtMatricula.getText());
 				aluno.setNome(txtNome.getText());
+				// aluno.setPeriodo(Periodos.getValueWithDescricao(modelPeriodo.getSelectedItem().toString()));
+				aluno.setPeriodo(Periodos.values()[comboPeriodo.getSelectedIndex()]);
 				
 				turma.gravar(aluno, posicao);
 				posicao++;
 				
 				modelAlunos.addElement(aluno.getNome());
+				
+				if (posicao >= turma.getTamanho()) {
+					btnSalvar.setEnabled(false);
+					btnSalvar.setBackground(Color.LIGHT_GRAY);
+					
+					JOptionPane.showMessageDialog(null, "turma preenchida completamente!", 
+								"Turma Preenchida", JOptionPane.WARNING_MESSAGE);
+				}
 			}
 		});
 		btnSalvar.setBackground(new Color(0, 204, 102));
@@ -114,6 +128,16 @@ public class FrameCadastroAlunos extends JFrame {
 		
 		JList listAlunos = new JList();
 		listAlunos.setModel(modelAlunos);
+		listAlunos.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				Aluno aluno = turma.listarAluno(listAlunos.getSelectedIndex());
+				
+				txtNome.setText(aluno.getNome());
+				txtMatricula.setText(aluno.getMatricula());
+				comboPeriodo.setSelectedIndex(aluno.getPeriodo().ordinal());
+			}
+		});
 		scrollPaneOfListAlunos.setViewportView(listAlunos);
 	}
 }
